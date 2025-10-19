@@ -91,7 +91,7 @@ public class Main {
                 
             i.e. ~c = (233, 47, 87, 131, 168, 2, 134, 62)T
             
-            
+            pg25
             Example 2.2.1. Continuing with Example 2.1.1, we may chose I = {0, 1, 2, 3, 4}. Then
             we must interpolate the points (0, 233), (1, 47), (2, 87), (3, 131), and (4, 168). 
             This means that
@@ -175,32 +175,76 @@ public class Main {
             ex.printStackTrace();
         }
         
-        //Compute the coefficients of
-        //p(x) = PRODUCT( αi ∈ ~α (x - αi))
-        //page121
-        //Algorithm A.3.4 Constructing a polynomial from its roots
+        /*********************************************************************************************
+        Example 2.3.1. Consider the first message from Example 1.4.1, ~m = (233, 211, 0, 7, 18)T
+        with l = 8 and k = 5. We have the message polynomial
         
+            µ(x) = 65x^4 + 112x^3 + 10x^2 + x + 233
+            
+        and systematic codeword ~c = (233, 211, 0, 7, 18, 166, 14, 135)T
+        ************************************************************************************************/
         PolynomialFunctions poly = new PolynomialFunctions();
-        int[] a_vec = { 0, 1, 2, 3, 4, 5};
-        //GF(256) x + 0 
-        //GF(256) (x + 0)(x + 1) == x^2 + x
-        //GF(256) (x^2 + x)(x + 2) == x^3 + 3x^2 + 2x
-        //GF(256) (x^3 + 3x^2 + 2x)(x + 3) == x^4 + (2^25 ^ 2^25)x^3 + (2^50 ^ 2^1)x^2 + (2^26)x
-        //                                 == x^4 + 0x^3 + (5 ^ 2)x^2 + 6x
-        //                                 == x^4 + 0x^3 + 7x^2 + 6x
         
-        //GF(256) (x^4 + 0x^3 + 7x^2 + 6x)(x + 4) == x^5 + (4 ^ 0)x^4 + (0 ^ 7)x^3 + (7*4 + 6)x^2 + (6*4)x
-        //                                        == x^5 + 4x^4 + 7x^3 + (2^(198+2) ^ 6)x^2 + (2^(26+2))x
-        //                                        == x^5 + 4x^4 + 7x^3 + (28 ^ 6)x^2 + 24x
-        //                                        == x^5 + 4x^4 + 7x^3 + 26x^2 + 24x
+        /********
+        System.out.println("***** test example 2.3.1 polycalc verified good *****");
+        int[] a = { 0, 1, 2, 3, 4, 5, 6, 7 };
+        int[] good_u = { 233, 1, 10, 112, 65 };
+        int[] c = new int[a.length];
+        System.out.print("c[ii] = ");
+        for (int ii=0; ii < a.length; ii++)
+        {
+            c[ii] = poly.polycalc(good_u, a[ii]);
+            System.out.print(c[ii]);
+            if (ii != (a.length-1))
+                System.out.print(",");
+        }
+        System.out.println();
+        **********/
         
-        //GF(256) (x^5 + 4x^4 + 7x^3 + 26x^2 + 24x)(x + 5) == x^6 + (5 ^ 4)x^5 + (4*5 + 7)x^4      + (7*5 + 26)x^3        + (26*5 + 24)x^2       + (24*5)x
-        //                                                 == x^6 +  1x^5      + (2^(2+50) ^ 7)x^4 + (2^(198+50) ^ 26)x^3 + (2^(105+50) ^ 24)x^2 + (2^(28+50)x
-        //                                                 == x^6 +  1x^5      + (20 ^ 7)x^4       + (2^248  ^  26)x^3    + (2^155  ^  24)x^2    + (2^78)x
-        //                                                 == x^6 +  1x^5      +  19x^4            + (27     ^  26)x^3    + (114    ^  24)x^2    +  120x
-        //                                                 == x^6 +  1x^5      +  19x^4            +    1x^3              +  106x^2              +  120x
-        int[] pdeg5 = poly.POLYROOTS(a_vec);
-        poly.Debug_Print(pdeg5); 
+        /*********************************************************************************************
+        Example 2.3.1. Consider the first message from Example 1.4.1, ~m = (233, 211, 0, 7, 18)T
+        with l = 8 and k = 5. We have the message polynomial
+        
+            µ(x) = 65x^4 + 112x^3 + 10x^2 + x + 233
+            
+        and systematic codeword ~c = (233, 211, 0, 7, 18, 166, 14, 135)T
+        ************************************************************************************************/
+        System.out.println("***** hey its working *****");
+        int[] a_vec = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        int[] correct_u = { 233, 1, 10, 112, 65 };
+        int[] c_vec = new int[a_vec.length];
+        int k=5;
+        for (int ii=0; ii < a_vec.length; ii++)
+        {
+            int temp = poly.polycalc(correct_u, ii);
+            c_vec[ii] = temp;
+        }
+        System.out.println("c_vec = ");
+        poly.Debug_Print(c_vec);
+        
+        int[] u = null;
+        try {
+            u = poly.my_LAGRANGEINTERPOLATE(a_vec, c_vec);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
+        
+        System.out.print("u(x) = ");
+        poly.Debug_Print(u);
+        
+        
+        int[] check_c = new int[a_vec.length];
+        System.out.print("check_c = ");
+        for (int ii=0; ii < a_vec.length; ii++)
+        {
+            check_c[ii] = poly.polycalc(u, a_vec[ii]);
+            System.out.print(check_c[ii]);
+            if (ii != (a_vec.length-1))
+                System.out.print(",");
+        }
+        System.out.println();
         
     }//main
     

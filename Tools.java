@@ -381,6 +381,42 @@ public class Tools {
             return gf256num;
         }
     }//GF256multiply
+    
+    
+    public int GF256divide(int top, int bottom) throws Exception
+    {
+        //GF(256) world
+        if (bottom==0)
+            throw new Exception("GF256divide: bottom==0");
+        
+        if (top==0)
+            return 0;
+        
+        int top_alpha_exp = Table_Integer_To_Exponent_Of_Alpha()[top];
+        int bottom_alpha_exp = Table_Integer_To_Exponent_Of_Alpha()[bottom];
+        int total_exp = top_alpha_exp - bottom_alpha_exp;
+        if (total_exp < 0)
+        {
+            /***********************************************
+            Negative exponents: As with regular arithmetic, 
+            a^{-n}=(a^{-1})^{n}). 
+            Therefore, calculating (alpha ^{-n}) involves 
+            finding the multiplicative inverse of alpha(i.e., (alpha ^{-1}) 
+            and then raising that result to the power of n.
+            A multiplicative inverse is a number that, when multiplied by a given number, equals 1
+            ************************************************/
+            //in GF(256)
+            //2 == 2^1
+            //2^1 * 2^254 == 2^(1+254) == 2^255 == 1
+            int pos_exp = total_exp * -1;
+            total_exp = 254 + pos_exp;
+        }
+        if (total_exp >= 256)
+            total_exp %= 255;
+
+        int gf256num = Table_Exponent_Of_Alpha_To_Integer()[total_exp];
+        return gf256num;
+    }//GF256divide
                 
         
 }//class
