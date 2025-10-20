@@ -211,12 +211,12 @@ public class Main {
         ************************************************************************************************/
         System.out.println("***** hey its working *****");
         int[] a_vec = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        int[] correct_u = { 233, 1, 10, 112, 65 };
+        int[] correct_m_vec = { 233, 1, 10, 112, 65 };
         int[] c_vec = new int[a_vec.length];
         int k=5;
         for (int ii=0; ii < a_vec.length; ii++)
         {
-            int temp = poly.polycalc(correct_u, ii);
+            int temp = poly.polycalc(correct_m_vec, ii);
             c_vec[ii] = temp;
         }
         System.out.println("c_vec = ");
@@ -246,6 +246,39 @@ public class Main {
         }
         System.out.println();
         
+        //****************************************************************************
+        //https://www.thonky.com/qr-code-tutorial/error-correction-table
+	//
+	//Version and EC Level                                = 6-H
+	//Number of Blocks in Group1                          = 4
+	//Number of Data Codewords in Each of Group1's Blocks = 15
+	//Number of Blocks in Group2                          = 0
+	//Number of Data Codewords in Each of Group2's Blocks = 0
+                
+        /*********************************************************************************
+        Integer[] correct_QRcode6H_block = 
+			{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134, //data codewords
+			  1, 237, 236, 157, 0, 147, 103, 21, 108, 39, 188, 98, 145, 180, //error-correction codewords 
+			  116, 192, 73, 140, 225, 5, 42, 103, 242, 71, 137, 132, 201, 134 };
+        *************************************************************************************/
+        int[] correct_QRcode6H_block_message_only = 
+			{ 67, 166, 135, 71, 71, 7, 51, 162, 242, 247, 119, 119, 114, 230, 134 };
+        
+        int[] a_vec2 = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 
+                        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 };
+        
+        int[] c_vec2 = new int[a_vec2.length];
+        k=15;
+        for (int ii=0; ii < a_vec2.length; ii++)
+        {
+            int temp = poly.polycalc(correct_QRcode6H_block_message_only, ii);
+            c_vec2[ii] = temp;
+        }
+        System.out.println("c_vec2 = ");
+        poly.Debug_Print(c_vec2);
+        System.out.println("So totally different algo from 1 used to correct QRcode-version6H");
     }//main
     
-}
+}//class
+

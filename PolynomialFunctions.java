@@ -79,34 +79,6 @@ public class PolynomialFunctions {
     }//POLYROOTS
     
     
-    
-    
-    //pg123
-    //Algorithm A.3.6 Polynomial division by x − α
-    //Determine ~q and r such that p(x)/(x−α) = q(x) + r/(x−α)
-    //Determine the degree of p(x) based on the length of ~p
-    public void technically_never_should_have_remainder_buggy_POLYDIVLIN(int[] p_vec, int a_ii)
-    {
-        Tools tool = new Tools();
-        
-        int n = p_vec.length - 1;
-        int[] q_vec = new int[p_vec.length];
-        //initialize
-        for (int ii=0; ii < p_vec.length; ii++)
-            q_vec[ii] = p_vec[ii];
-        //GF256
-        for (int ii=1; ii <= n; ii++)
-        {
-            int gf256num = tool.GF256multiply(a_ii, q_vec[ii-1]);
-            q_vec[ii] = q_vec[ii] ^ gf256num;
-        }
-        POLYDIVLIN_Remainder = q_vec[n];
-        POLYDIVLIN_qvec      = new int[n];
-        for (int ii=0; ii < n; ii++)
-            POLYDIVLIN_qvec[ii] = q_vec[ii];
-    }//technically_never_should_have_remainder_buggy_POLYDIVLIN
-    
-    
     //Algorithm A.3.1 Polynomial evaluation (Horner’s Algorithm)
     //(1) Evaluate the polynomial ~p at the points ~a
     //(2) Determine the degree of p(x) based on the length of ~p
@@ -131,58 +103,6 @@ public class PolynomialFunctions {
         return y;
     }//POLYEVAL
     
-    
-    //Algorithm A.3.8 Lagrange interpolation
-    //Dependencies: 
-    //POLYROOTS defined in Algorithm A.3.4, 
-    //POLYDIVLIN defined in Algorithm A.3.6, 
-    //POLYEVAL defined in Algorithm A.3.1.
-    //(1) Construct the coefficients of the polynomial p(x) such that p(~α) = ~β
-    public int[] buggy_LAGRANGEINTERPOLATE(int[] a_vec, int[] B_vec) throws Exception
-    {
-        if (a_vec.length != B_vec.length)
-            throw new Exception("buggy_LAGRANGEINTERPOLATE: a_vec.length != B_vec.length");
-        
-        Tools tool = new Tools();
-        
-        int n = a_vec.length;
-        //(2) p(x) will have degree n − 1
-        int[] p_vec = new int[n];
-        //Initialize ~p as a length n vector of zeros
-        for (int ii=0; ii < n; ii++)
-            p_vec[ii] = 0;
-        
-        //(3) Construct d(x)  = PRODUCT(from j=0 to n-1 (x − αj))
-        int[] d_vec = this.POLYROOTS(a_vec);
-        
-        //(4) Construct di(x) = PRODUCT(j!=i, from j=0 to n-1 (x − αj)) = d(x)/(x−αi)
-        for (int ii=0; ii < n; ii++)
-        {
-            this.technically_never_should_have_remainder_buggy_POLYDIVLIN(d_vec, a_vec[ii]);
-            int[] di_vec = this.POLYDIVLIN_qvec;
-            
-            //(5) Division should have a zero remainder
-            if (this.POLYDIVLIN_Remainder != 0)
-                throw new Exception("buggy_LAGRANGEINTERPOLATE: this.POLYDIVLIN_Remainder != 0");
-            else
-            {
-                //(6) Construct a = βi/di(αi)
-                int[] temp_array = { a_vec[ii] };
-                int[] gf256_bottom_array_length1 = this.POLYEVAL(di_vec, temp_array);
-                if (gf256_bottom_array_length1.length != 1)
-                    throw new Exception("buggy_LAGRANGEINTERPOLATE: gf256_bottom_array_length1.length != 1");
-
-                int gf256_a = tool.GF256divide(B_vec[ii], gf256_bottom_array_length1[0]);
-
-                //~p ← ~p + (a)(~di)
-                for (int pp=0; pp < n; pp++)
-                {
-                    p_vec[pp] = p_vec[pp] ^ tool.GF256multiply(gf256_a, di_vec[pp]);
-                }
-            }
-        }
-        return p_vec;
-    }//buggy_LAGRANGEINTERPOLATE
     
     /*********************************************************************************************
         page25
@@ -296,38 +216,6 @@ public class PolynomialFunctions {
         }
         return answer_poly;
     }
-    
-    
-    public int[] shitty_LAGRANGEINTERPOLATE(int[] a_vec, int[] B_vec) throws Exception
-    {
-        if (a_vec.length != B_vec.length)
-            throw new Exception("shitty_LAGRANGEINTERPOLATE: a_vec.length != B_vec.length");
-        
-        Tools tool = new Tools();  
-        ArrayList<int[]> terms = new ArrayList<int[]>();
-        for (int ii=0; ii < a_vec.length; ii++)
-        {
-            int[] poly = roots_ii_cannotequal_jj(a_vec, ii); 
-            int bottom = calc_product_aii_minus_ajj_where_ii_cannotequal_jj(a_vec, ii);
-            int B_ii = B_vec[ii];
-            int mult = tool.GF256divide(B_ii, bottom);
-            
-            for (int pp=0; pp < poly.length; pp++)
-                poly[pp] = tool.GF256multiply(mult, poly[pp]);
-            
-            terms.add(poly);
-        }
-        
-        int[] u = new int[terms.size()];
-        for (int uu=0; uu < u.length; uu++)
-        {
-            int sum = 0;
-            for (int ii=0; ii < a_vec.length; ii++)
-                sum ^= this.polycalc(terms.get(uu), a_vec[ii]);
-            u[uu] = sum;
-        }
-        return u; 
-    }//shitty_LAGRANGEINTERPOLATE
     
     public int[] roots_ii_cannotequal_jj(int[] a_vec, int ii)
     {
