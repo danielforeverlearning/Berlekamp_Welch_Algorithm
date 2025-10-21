@@ -30,18 +30,6 @@ public class Main {
             //Pages62_66_Modified_Welch_Berlekamp_Algorithm algo = new Pages62_66_Modified_Welch_Berlekamp_Algorithm(r_vector,k);
             //boolean success = algo.go();
             
-            //Ok i think i figured it out i think .....
-            //Berlekamp-Welch and Modified-Berlekamp-Welch
-            //algorithms work on systematic-encoding where
-            //you use a different polynomial u(x) called the  "message-polynomial" and you use ai=0,1,2,3,4,5 .....i-1
-            //as inputs to x in the message-polynomial to get 
-            //the first k bytes which are the message-bytes followed by the error-correction-bytes which
-            //you put after the message-bytes.
-            //BUT QR-codes first use polynomial-long-division on a polynomial by
-            //a generator-polynomial and the error-correction-bytes which you
-            //put after the message-bytes are the remainder-bytes from the polynomial-long-division.
-            //This message-bytes and error-correction-bytes are not u(x)
-            //you have to calculate u(x) first.
             
             /**********************************************************************
             2.3 Systematic Encoding
@@ -245,6 +233,19 @@ public class Main {
                 System.out.print(",");
         }
         System.out.println();
+        
+        //Ok i think i figured it out i think .....
+        //Berlekamp-Welch and Modified-Berlekamp-Welch
+        //algorithms work on systematic-encoding where
+        //you use a different polynomial u(x) called the  "message-polynomial" and you use ai=0,1,2,3,4,5 .....i-1
+        //as inputs to x in the message-polynomial to get 
+        //the first k bytes which are the message-bytes followed by the error-correction-bytes which
+        //you put after the message-bytes.
+        //BUT QR-codes first use polynomial-long-division on a polynomial by
+        //a generator-polynomial and the error-correction-bytes which you
+        //put after the message-bytes are the remainder-bytes from the polynomial-long-division.
+        //These message-bytes and error-correction-bytes are NOT u(x)
+        //from Berlekamp-Welch and Modified-Berlekamp-Welch algorithms.
         
         //****************************************************************************
         //https://www.thonky.com/qr-code-tutorial/error-correction-table
